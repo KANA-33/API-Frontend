@@ -12,6 +12,7 @@ import { AdminShell } from "@widgets/admin-shell/admin-shell";
 import { AppShell } from "@widgets/app-shell/app-shell";
 import { AdminOverviewPage } from "@pages/admin/admin-overview-page";
 import { AdminChannelsPage } from "@pages/admin/admin-channels-page";
+import { AdminModelsPage } from "@pages/admin/admin-models-page";
 import { AdminPlaceholderPage } from "@pages/admin/admin-placeholder-page";
 import { AdminUsersPage } from "@pages/admin/admin-users-page";
 import { ApiKeysPage } from "@pages/api-keys/api-keys-page";
@@ -25,7 +26,7 @@ import { PlaygroundPage } from "@pages/playground/playground-page";
 import { ProfilePage } from "@pages/profile/profile-page";
 import { WalletPage } from "@pages/wallet/wallet-page";
 import { NotFoundPage } from "@pages/not-found/not-found-page";
-import { Boxes, CreditCard, KeyRound, Logs, Settings2 } from "lucide-react";
+import { CreditCard, KeyRound, Logs, Settings2 } from "lucide-react";
 
 const rootRoute = createRootRoute({
   component: () => <Outlet />,
@@ -150,13 +151,7 @@ const adminChannelsRoute = createRoute({
 const adminModelsRoute = createRoute({
   getParentRoute: () => adminRoute,
   path: "/admin/models",
-  component: () => (
-    <AdminPlaceholderPage
-      description="Model metadata, vendors, missing models, sync previews, and deployment surfaces."
-      icon={Boxes}
-      title="Models"
-    />
-  ),
+  component: AdminModelsPage,
 });
 
 const adminLogsRoute = createRoute({
