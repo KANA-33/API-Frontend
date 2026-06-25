@@ -12,6 +12,7 @@ import { AdminShell } from "@widgets/admin-shell/admin-shell";
 import { AppShell } from "@widgets/app-shell/app-shell";
 import { AdminOverviewPage } from "@pages/admin/admin-overview-page";
 import { AdminPlaceholderPage } from "@pages/admin/admin-placeholder-page";
+import { AdminUsersPage } from "@pages/admin/admin-users-page";
 import { ApiKeysPage } from "@pages/api-keys/api-keys-page";
 import { ErrorPage } from "@pages/error/error-page";
 import { LoginPage } from "@pages/login/login-page";
@@ -23,7 +24,7 @@ import { PlaygroundPage } from "@pages/playground/playground-page";
 import { ProfilePage } from "@pages/profile/profile-page";
 import { WalletPage } from "@pages/wallet/wallet-page";
 import { NotFoundPage } from "@pages/not-found/not-found-page";
-import { Activity, Boxes, CreditCard, KeyRound, Logs, Settings2, UsersRound } from "lucide-react";
+import { Activity, Boxes, CreditCard, KeyRound, Logs, Settings2 } from "lucide-react";
 
 const rootRoute = createRootRoute({
   component: () => <Outlet />,
@@ -136,13 +137,7 @@ const adminIndexRoute = createRoute({
 const adminUsersRoute = createRoute({
   getParentRoute: () => adminRoute,
   path: "/admin/users",
-  component: () => (
-    <AdminPlaceholderPage
-      description="Admin account operations for users, roles, quota, and security bindings."
-      icon={UsersRound}
-      title="Users"
-    />
-  ),
+  component: AdminUsersPage,
 });
 
 const adminChannelsRoute = createRoute({
