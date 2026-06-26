@@ -137,6 +137,18 @@ Maintenance rule:
 - Completed: 2026-06-26
 - Notes: Added admin quota and flow inspection backed by `/api/data/`, `/api/data/users`, and `/api/data/flow`, with date and username filters.
 
+### Subscription Plan Management
+
+- Owner: `/admin/billing`
+- Completed: 2026-06-26
+- Notes: Added subscription plan list, create, edit, and enable/disable flows backed by `GET/POST/PUT/PATCH /api/subscription/admin/plans`.
+
+### Full Payment Gateway Configuration
+
+- Owner: `/admin/billing`
+- Completed: 2026-06-26
+- Notes: Added root-only payment gateway configuration for general top-up pricing, Stripe, Creem, Waffo, and Waffo Pancake through the backend option API, plus payment compliance confirmation through `POST /api/option/payment_compliance`.
+
 ## Channels
 
 No deferred Channel items remain.
@@ -155,17 +167,7 @@ No deferred Logs / Audit items remain. Log cleanup and channel affinity panels a
 
 ## Billing
 
-### Subscription Plan Management
-
-- Owner: `/admin/billing`
-- Permission: Admin
-- Notes: Plan CRUD, plan status, and user subscription binding.
-
-### Full Payment Gateway Configuration
-
-- Owner: `/admin/billing` or `/admin/settings/billing`
-- Permission: Root-only preferred
-- Notes: EPay, Stripe, Creem, Waffo, and Waffo Pancake settings.
+No deferred Billing items remain.
 
 ## Settings / Operations
 

@@ -240,6 +240,9 @@ handling.
 | Admin 2FA stats               | GET      | `/api/user/2fa/stats`                                       | Admin session | Returns total users, enabled users, enabled rate                      |
 | Admin disable user 2FA        | DELETE   | `/api/user/:id/2fa`                                         | Admin session | Forcibly disables target user 2FA                                     |
 | Subscription plan list        | GET      | `/api/subscription/admin/plans`                             | Admin session | Lists available subscription plans                                    |
+| Subscription plan create      | POST     | `/api/subscription/admin/plans`                             | Admin session | Body `{ plan }`; requires payment compliance                          |
+| Subscription plan update      | PUT      | `/api/subscription/admin/plans/:id`                         | Admin session | Body `{ plan }`; requires payment compliance                          |
+| Subscription plan status      | PATCH    | `/api/subscription/admin/plans/:id`                         | Admin session | Body `{ enabled }`; requires payment compliance                       |
 | Bind subscription             | POST     | `/api/subscription/admin/bind`                              | Admin session | Body `{ user_id, plan_id }`                                           |
 | User subscription list        | GET      | `/api/subscription/admin/users/:id/subscriptions`           | Admin session | Lists active, expired, cancelled records                              |
 | Create user subscription      | POST     | `/api/subscription/admin/users/:id/subscriptions`           | Admin session | Body `{ plan_id }`; no payment                                        |
@@ -306,5 +309,6 @@ handling.
 | Redemption invalid cleanup    | DELETE   | `/api/redemption/invalid`                                   | Admin session | Removes used, disabled, expired codes                                 |
 | Admin top-up records          | GET      | `/api/user/topup`                                           | Admin session | Paginated, optional keyword                                           |
 | Manual top-up completion      | POST     | `/api/user/topup/complete`                                  | Admin session | Body `{ trade_no: string }`                                           |
+| Payment compliance confirm    | POST     | `/api/option/payment_compliance`                            | Root session  | Body `{ confirmed: true }`; records current compliance terms          |
 | Root option list              | GET      | `/api/option/`                                              | Root session  | Sensitive keys omitted by backend                                     |
 | Root option update            | PUT      | `/api/option/`                                              | Root session  | Body `{ key, value }`                                                 |

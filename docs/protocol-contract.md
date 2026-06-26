@@ -827,8 +827,19 @@ location_ids, container_config, registry_config }`. Update accepts mutable
 - Methods and Paths:
   - `GET /api/user/topup`
   - `POST /api/user/topup/complete`
+  - `GET /api/subscription/admin/plans`
+  - `POST /api/subscription/admin/plans`
+  - `PUT /api/subscription/admin/plans/:id`
+  - `PATCH /api/subscription/admin/plans/:id`
+  - `GET /api/option/`
+  - `PUT /api/option/`
+  - `POST /api/option/payment_compliance`
 - Auth: admin session
-- Notes: manual completion uses body `{ trade_no: string }`.
+- Notes: manual completion uses body `{ trade_no: string }`. Subscription plan
+  writes use body `{ plan }`; status updates use `{ enabled }`. Payment gateway
+  option edits are root-only and use `{ key, value }`. Payment compliance
+  confirmation uses `{ confirmed: true }` and must be completed before backend
+  payment-gated plan creation or update succeeds.
 
 ### Admin Settings
 
