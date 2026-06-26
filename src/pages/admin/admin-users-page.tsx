@@ -5,7 +5,9 @@ import {
   Pencil,
   RefreshCw,
   Shield,
+  ShieldCheck,
   ShieldOff,
+  Sparkles,
   Trash2,
   UserPlus,
   X,
@@ -26,6 +28,16 @@ const ROLE_COMMON = 1;
 const STATUS_ENABLED = 1;
 const STATUS_DISABLED = 2;
 const pageSize = 20;
+
+const bindingTypes: Array<{ label: string; value: usersApi.UserBindingType }> = [
+  { label: "Email", value: "email" },
+  { label: "GitHub", value: "github" },
+  { label: "Discord", value: "discord" },
+  { label: "OIDC", value: "oidc" },
+  { label: "WeChat", value: "wechat" },
+  { label: "Telegram", value: "telegram" },
+  { label: "Linux.do", value: "linuxdo" },
+];
 
 interface UserFormState {
   displayName: string;
@@ -113,6 +125,15 @@ export function AdminUsersPage() {
   const [quotaUser, setQuotaUser] = useState<AdminUser | null>(null);
   const [quotaMode, setQuotaMode] = useState<"add" | "override" | "subtract">("add");
   const [quotaValue, setQuotaValue] = useState("");
+  const [securityUser, setSecurityUser] = useState<AdminUser | null>(null);
+  const [oauthBindings, setOauthBindings] = useState<usersApi.UserOAuthBinding[] | null>(null);
+  const [oauthBindingsLoading, setOauthBindingsLoading] = useState(false);
+  const [subscriptionUser, setSubscriptionUser] = useState<AdminUser | null>(null);
+  const [userSubscriptions, setUserSubscriptions] = useState<
+    usersApi.UserSubscriptionSummary[] | null
+  >(null);
+  const [subscriptionsLoading, setSubscriptionsLoading] = useState(false);
+  const [selectedPlanId, setSelectedPlanId] = useState("");
   const [actionMessage, setActionMessage] = useState<string | null>(null);
 
   const { data, error, loading, reload } = useAsyncData(async () => {
@@ -132,6 +153,24 @@ export function AdminUsersPage() {
     return response.data;
   }, [page, appliedFilters]);
 
+  const {
+    data: twoFAStats,
+    error: twoFAStatsError,
+    reload: reloadTwoFAStats,
+  } = useAsyncData(async () => {
+    const response = await usersApi.getTwoFAStats();
+    return response.data;
+  }, []);
+
+  const {
+    data: subscriptionPlans,
+    error: subscriptionPlansError,
+    reload: reloadSubscriptionPlans,
+  } = useAsyncData(async () => {
+    const response = await usersApi.listSubscriptionPlans();
+    return response.data;
+  }, []);
+
   function applyFilters(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setPage(1);
@@ -148,6 +187,8 @@ export function AdminUsersPage() {
     setEditingUser(null);
     setFormMode("create");
     setQuotaUser(null);
+    setSecurityUser(null);
+    setSubscriptionUser(null);
     setActionMessage(null);
   }
 
@@ -156,6 +197,8 @@ export function AdminUsersPage() {
     setEditingUser(user);
     setFormMode("edit");
     setQuotaUser(null);
+    setSecurityUser(null);
+    setSubscriptionUser(null);
     setActionMessage(null);
   }
 
@@ -163,7 +206,52 @@ export function AdminUsersPage() {
     setFormMode(null);
     setEditingUser(null);
     setQuotaUser(null);
+    setSecurityUser(null);
+    setOauthBindings(null);
+    setSubscriptionUser(null);
+    setUserSubscriptions(null);
     setActionMessage(null);
+  }
+
+  async function openSecurityPanel(user: AdminUser) {
+    setSecurityUser(user);
+    setFormMode(null);
+    setEditingUser(null);
+    setQuotaUser(null);
+    setSubscriptionUser(null);
+    setActionMessage(null);
+    setOauthBindingsLoading(true);
+
+    try {
+      const response = await usersApi.getUserOAuthBindings(user.id);
+      setOauthBindings(response.data ?? []);
+    } catch (caught) {
+      setActionMessage(caught instanceof Error ? caught.message : "OAuth bindings unavailable");
+      setOauthBindings([]);
+    } finally {
+      setOauthBindingsLoading(false);
+    }
+  }
+
+  async function openSubscriptionPanel(user: AdminUser) {
+    setSubscriptionUser(user);
+    setFormMode(null);
+    setEditingUser(null);
+    setQuotaUser(null);
+    setSecurityUser(null);
+    setActionMessage(null);
+    setSubscriptionsLoading(true);
+
+    try {
+      const response = await usersApi.listUserSubscriptions(user.id);
+      setUserSubscriptions(response.data ?? []);
+      await reloadSubscriptionPlans();
+    } catch (caught) {
+      setActionMessage(caught instanceof Error ? caught.message : "Subscriptions unavailable");
+      setUserSubscriptions([]);
+    } finally {
+      setSubscriptionsLoading(false);
+    }
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -312,6 +400,199 @@ export function AdminUsersPage() {
     }
   }
 
+  async function handleUnbindOAuth(binding: usersApi.UserOAuthBinding) {
+    if (!securityUser) {
+      return;
+    }
+
+    const result = await confirmSensitive({
+      actionLabel: "Unbind OAuth",
+      confirmText: securityUser.username,
+      description: `This unbinds ${binding.provider_name} from "${securityUser.username}".`,
+      reasonLabel: "Reason for audit context",
+      title: "Unbind OAuth provider",
+    });
+
+    if (!result.confirmed) {
+      return;
+    }
+
+    try {
+      await usersApi.unbindUserOAuth(securityUser.id, binding.provider_id);
+      setActionMessage("OAuth provider unbound.");
+      await openSecurityPanel(securityUser);
+    } catch (caught) {
+      setActionMessage(caught instanceof Error ? caught.message : "OAuth unbind failed");
+    }
+  }
+
+  async function handleClearBinding(bindingType: usersApi.UserBindingType) {
+    if (!securityUser) {
+      return;
+    }
+
+    const result = await confirmSensitive({
+      actionLabel: "Clear binding",
+      confirmText: securityUser.username,
+      description: `This clears the ${bindingType} binding for "${securityUser.username}".`,
+      reasonLabel: "Reason for audit context",
+      title: "Clear user binding",
+    });
+
+    if (!result.confirmed) {
+      return;
+    }
+
+    try {
+      await usersApi.clearUserBinding(securityUser.id, bindingType);
+      setActionMessage("User binding cleared.");
+      await reload();
+    } catch (caught) {
+      setActionMessage(caught instanceof Error ? caught.message : "Clear binding failed");
+    }
+  }
+
+  async function handleResetPasskey() {
+    if (!securityUser) {
+      return;
+    }
+
+    const result = await confirmSensitive({
+      actionLabel: "Reset passkey",
+      confirmText: securityUser.username,
+      description: `This removes the passkey for "${securityUser.username}" if one is bound.`,
+      reasonLabel: "Reason for audit context",
+      title: "Reset user passkey",
+    });
+
+    if (!result.confirmed) {
+      return;
+    }
+
+    try {
+      await usersApi.resetUserPasskey(securityUser.id);
+      setActionMessage("Passkey reset completed.");
+    } catch (caught) {
+      setActionMessage(caught instanceof Error ? caught.message : "Passkey reset failed");
+    }
+  }
+
+  async function handleDisableTwoFA() {
+    if (!securityUser) {
+      return;
+    }
+
+    const result = await confirmSensitive({
+      actionLabel: "Disable 2FA",
+      confirmText: securityUser.username,
+      description: `This forcibly disables 2FA for "${securityUser.username}".`,
+      reasonLabel: "Reason for audit context",
+      title: "Disable user 2FA",
+    });
+
+    if (!result.confirmed) {
+      return;
+    }
+
+    try {
+      await usersApi.disableUserTwoFA(securityUser.id);
+      setActionMessage("2FA disabled.");
+      await reloadTwoFAStats();
+    } catch (caught) {
+      setActionMessage(caught instanceof Error ? caught.message : "Disable 2FA failed");
+    }
+  }
+
+  async function handleCreateSubscription() {
+    if (!subscriptionUser) {
+      return;
+    }
+
+    const planId = Number(selectedPlanId);
+    if (!Number.isFinite(planId) || planId <= 0) {
+      setActionMessage("Select a subscription plan.");
+      return;
+    }
+
+    const plan = subscriptionPlans?.find((item) => item.plan.id === planId)?.plan;
+    const result = await confirmSensitive({
+      actionLabel: "Bind subscription",
+      description: `This grants "${subscriptionUser.username}" the selected subscription plan${plan ? `: ${plan.title}` : ""}.`,
+      intent: "warning",
+      reasonLabel: "Reason for audit context",
+      title: "Bind user subscription",
+    });
+
+    if (!result.confirmed) {
+      return;
+    }
+
+    try {
+      await usersApi.createUserSubscription(subscriptionUser.id, planId);
+      setActionMessage("Subscription bound.");
+      setSelectedPlanId("");
+      await openSubscriptionPanel(subscriptionUser);
+    } catch (caught) {
+      setActionMessage(caught instanceof Error ? caught.message : "Subscription bind failed");
+    }
+  }
+
+  async function handleInvalidateSubscription(summary: usersApi.UserSubscriptionSummary) {
+    if (!subscriptionUser) {
+      return;
+    }
+
+    const subscription = summary.subscription;
+    const result = await confirmSensitive({
+      actionLabel: "Invalidate subscription",
+      confirmText: subscriptionUser.username,
+      description: `This immediately cancels subscription #${subscription.id} and may downgrade the user's group.`,
+      reasonLabel: "Reason for audit context",
+      title: "Invalidate user subscription",
+    });
+
+    if (!result.confirmed) {
+      return;
+    }
+
+    try {
+      await usersApi.invalidateUserSubscription(subscription.id);
+      setActionMessage("Subscription invalidated.");
+      await openSubscriptionPanel(subscriptionUser);
+      await reload();
+    } catch (caught) {
+      setActionMessage(caught instanceof Error ? caught.message : "Subscription invalidate failed");
+    }
+  }
+
+  async function handleDeleteSubscription(summary: usersApi.UserSubscriptionSummary) {
+    if (!subscriptionUser) {
+      return;
+    }
+
+    const subscription = summary.subscription;
+    const result = await confirmSensitive({
+      actionLabel: "Delete subscription",
+      confirmText: subscriptionUser.username,
+      description: `This hard-deletes subscription #${subscription.id}. Use invalidate for ordinary cancellation.`,
+      reasonLabel: "Reason for audit context",
+      title: "Delete user subscription",
+    });
+
+    if (!result.confirmed) {
+      return;
+    }
+
+    try {
+      await usersApi.deleteUserSubscription(subscription.id);
+      setActionMessage("Subscription deleted.");
+      await openSubscriptionPanel(subscriptionUser);
+      await reload();
+    } catch (caught) {
+      setActionMessage(caught instanceof Error ? caught.message : "Subscription delete failed");
+    }
+  }
+
   const totalPages = Math.max(1, Math.ceil((data?.total ?? 0) / pageSize));
 
   return (
@@ -376,7 +657,7 @@ export function AdminUsersPage() {
         </form>
       </Card>
 
-      {(formMode || quotaUser || actionMessage) && (
+      {(formMode || quotaUser || securityUser || subscriptionUser || actionMessage) && (
         <Card className="border-[#c9baa4]">
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -387,7 +668,11 @@ export function AdminUsersPage() {
                     ? `Edit ${editingUser?.username}`
                     : quotaUser
                       ? `Adjust quota for ${quotaUser.username}`
-                      : "User action"}
+                      : securityUser
+                        ? `Security for ${securityUser.username}`
+                        : subscriptionUser
+                          ? `Subscriptions for ${subscriptionUser.username}`
+                          : "User action"}
               </h2>
               {actionMessage && (
                 <p className="mt-2 text-sm leading-6 text-[#655b50]">{actionMessage}</p>
@@ -515,6 +800,226 @@ export function AdminUsersPage() {
               <Button type="submit">Apply</Button>
             </form>
           )}
+
+          {securityUser && (
+            <div className="mt-6 grid gap-5 xl:grid-cols-[0.38fr_0.62fr]">
+              <div className="rounded-md border border-[#ddcfbd] bg-[#f8f1e7] p-4">
+                <p className="text-sm font-semibold text-[#2d2926]">2FA coverage</p>
+                <p className="mt-2 text-3xl font-semibold">
+                  {twoFAStats?.enabled_rate ?? "Unknown"}
+                </p>
+                <p className="mt-1 text-xs text-[#7c6e5e]">
+                  {twoFAStats
+                    ? `${twoFAStats.enabled_users} of ${twoFAStats.total_users} users enabled`
+                    : "Stats unavailable"}
+                </p>
+                {twoFAStatsError && (
+                  <p className="mt-2 text-xs text-[#8a4d3d]">{twoFAStatsError}</p>
+                )}
+                <div className="mt-5 flex flex-wrap gap-2">
+                  <Button onClick={() => void handleDisableTwoFA()} variant="secondary">
+                    Disable 2FA
+                  </Button>
+                  <Button onClick={() => void handleResetPasskey()} variant="secondary">
+                    Reset passkey
+                  </Button>
+                </div>
+              </div>
+
+              <div className="rounded-md border border-[#ddcfbd] bg-[#f8f1e7] p-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-sm font-semibold text-[#2d2926]">Account bindings</p>
+                    <p className="mt-1 text-xs text-[#7c6e5e]">
+                      OAuth providers and legacy account identifiers that can be cleared by admin.
+                    </p>
+                  </div>
+                  <Button onClick={() => void openSecurityPanel(securityUser)} variant="secondary">
+                    Refresh
+                  </Button>
+                </div>
+
+                <div className="mt-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#8d7a63]">
+                    OAuth
+                  </p>
+                  <div className="mt-2 space-y-2">
+                    {oauthBindingsLoading ? (
+                      <p className="text-sm text-[#655b50]">Loading OAuth bindings...</p>
+                    ) : (oauthBindings ?? []).length === 0 ? (
+                      <p className="text-sm text-[#655b50]">No OAuth bindings found.</p>
+                    ) : (
+                      (oauthBindings ?? []).map((binding) => (
+                        <div
+                          className="flex flex-col gap-2 rounded-md border border-[#e1d3c0] bg-[#fffaf3] p-3 sm:flex-row sm:items-center sm:justify-between"
+                          key={binding.provider_id}
+                        >
+                          <div>
+                            <p className="text-sm font-medium text-[#2d2926]">
+                              {binding.provider_name}
+                            </p>
+                            <p className="mt-1 font-mono text-xs text-[#7c6e5e]">
+                              {binding.provider_slug} · {binding.provider_user_id}
+                            </p>
+                          </div>
+                          <button
+                            className="rounded-md px-2 py-1 text-xs font-medium text-[#7a4a3b] hover:bg-[#f0dfd2]"
+                            onClick={() => void handleUnbindOAuth(binding)}
+                            type="button"
+                          >
+                            Unbind
+                          </button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                <div className="mt-5">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#8d7a63]">
+                    Direct bindings
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {bindingTypes.map((binding) => (
+                      <button
+                        className="rounded-md border border-[#d8cbb8] bg-[#fffaf3] px-3 py-2 text-xs font-medium text-[#4b4640] hover:bg-[#eadfce]"
+                        key={binding.value}
+                        onClick={() => void handleClearBinding(binding.value)}
+                        type="button"
+                      >
+                        Clear {binding.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {subscriptionUser && (
+            <div className="mt-6 grid gap-5 xl:grid-cols-[0.42fr_0.58fr]">
+              <div className="rounded-md border border-[#ddcfbd] bg-[#f8f1e7] p-4">
+                <p className="text-sm font-semibold text-[#2d2926]">Bind plan</p>
+                <p className="mt-1 text-xs text-[#7c6e5e]">
+                  Grant an active subscription without payment.
+                </p>
+                {subscriptionPlansError && (
+                  <p className="mt-3 text-xs text-[#8a4d3d]">{subscriptionPlansError}</p>
+                )}
+                <div className="mt-4 grid gap-3">
+                  <select
+                    className="h-11 rounded-md border border-[#d8cbb8] bg-[#fffaf3] px-3 text-sm outline-none focus:border-[#8b765e]"
+                    onChange={(event) => setSelectedPlanId(event.target.value)}
+                    value={selectedPlanId}
+                  >
+                    <option value="">Select plan</option>
+                    {(subscriptionPlans ?? []).map(({ plan }) => (
+                      <option key={plan.id} value={plan.id}>
+                        {plan.title} · {plan.price_amount} {plan.currency}
+                      </option>
+                    ))}
+                  </select>
+                  <Button onClick={() => void handleCreateSubscription()}>Bind subscription</Button>
+                </div>
+                <div className="mt-5 space-y-2">
+                  {(subscriptionPlans ?? []).slice(0, 6).map(({ plan }) => (
+                    <div
+                      className="rounded-md border border-[#e1d3c0] bg-[#fffaf3] p-3"
+                      key={plan.id}
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <p className="text-sm font-medium text-[#2d2926]">{plan.title}</p>
+                        <span className="text-xs text-[#7c6e5e]">
+                          {plan.enabled ? "Enabled" : "Disabled"}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-xs text-[#7c6e5e]">
+                        {plan.duration_value} {plan.duration_unit} · quota{" "}
+                        {formatRawNumber(plan.total_amount ?? 0)}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-md border border-[#ddcfbd] bg-[#f8f1e7] p-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-sm font-semibold text-[#2d2926]">User subscriptions</p>
+                    <p className="mt-1 text-xs text-[#7c6e5e]">
+                      Active, expired, and cancelled subscription records.
+                    </p>
+                  </div>
+                  <Button
+                    onClick={() => void openSubscriptionPanel(subscriptionUser)}
+                    variant="secondary"
+                  >
+                    Refresh
+                  </Button>
+                </div>
+
+                <div className="mt-4 max-h-[28rem] space-y-3 overflow-auto">
+                  {subscriptionsLoading ? (
+                    <p className="text-sm text-[#655b50]">Loading subscriptions...</p>
+                  ) : (userSubscriptions ?? []).length === 0 ? (
+                    <p className="text-sm text-[#655b50]">No subscriptions found.</p>
+                  ) : (
+                    (userSubscriptions ?? []).map((summary) => {
+                      const subscription = summary.subscription;
+                      const plan = subscriptionPlans?.find(
+                        (item) => item.plan.id === subscription.plan_id,
+                      )?.plan;
+                      return (
+                        <div
+                          className="rounded-md border border-[#e1d3c0] bg-[#fffaf3] p-3"
+                          key={subscription.id}
+                        >
+                          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                            <div>
+                              <p className="text-sm font-medium text-[#2d2926]">
+                                #{subscription.id} · {plan?.title ?? `Plan ${subscription.plan_id}`}
+                              </p>
+                              <p className="mt-1 text-xs text-[#7c6e5e]">
+                                {subscription.status} · source {subscription.source}
+                              </p>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                              <button
+                                className="rounded-md px-2 py-1 text-xs font-medium text-[#5f554b] hover:bg-[#eadfce]"
+                                onClick={() => void handleInvalidateSubscription(summary)}
+                                type="button"
+                              >
+                                Invalidate
+                              </button>
+                              <button
+                                className="rounded-md px-2 py-1 text-xs font-medium text-[#7a4a3b] hover:bg-[#f0dfd2]"
+                                onClick={() => void handleDeleteSubscription(summary)}
+                                type="button"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </div>
+                          <div className="mt-3 grid gap-2 text-xs text-[#655b50] md:grid-cols-2">
+                            <span>
+                              Quota {formatRawNumber(subscription.amount_used)} /{" "}
+                              {formatRawNumber(subscription.amount_total)}
+                            </span>
+                            <span>
+                              {formatTime(subscription.start_time)} -{" "}
+                              {formatTime(subscription.end_time)}
+                            </span>
+                            <span>Upgrade {subscription.upgrade_group || "None"}</span>
+                            <span>Downgrade {subscription.downgrade_group || "Default"}</span>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </Card>
       )}
 
@@ -622,11 +1127,28 @@ export function AdminUsersPage() {
                             setQuotaUser(user);
                             setFormMode(null);
                             setEditingUser(null);
+                            setSecurityUser(null);
                             setActionMessage(null);
                           }}
                           type="button"
                         >
                           Quota
+                        </button>
+                        <button
+                          aria-label="Security and bindings"
+                          className="rounded-md p-2 text-[#5f554b] hover:bg-[#eadfce]"
+                          onClick={() => void openSecurityPanel(user)}
+                          type="button"
+                        >
+                          <ShieldCheck className="size-4" />
+                        </button>
+                        <button
+                          aria-label="User subscriptions"
+                          className="rounded-md p-2 text-[#5f554b] hover:bg-[#eadfce]"
+                          onClick={() => void openSubscriptionPanel(user)}
+                          type="button"
+                        >
+                          <Sparkles className="size-4" />
                         </button>
                         <button
                           aria-label={

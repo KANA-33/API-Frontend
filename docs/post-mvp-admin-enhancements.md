@@ -101,6 +101,36 @@ Maintenance rule:
 - Completed: 2026-06-26
 - Notes: Added CRUD for model, tag, and endpoint prefill groups backed by `GET/POST/PUT/DELETE /api/prefill_group`.
 
+### OAuth Binding View And Unbind
+
+- Owner: `/admin/users`
+- Completed: 2026-06-26
+- Notes: Added user security panel backed by `GET /api/user/:id/oauth/bindings` and `DELETE /api/user/:id/oauth/bindings/:provider_id`.
+
+### Clear User Bindings
+
+- Owner: `/admin/users`
+- Completed: 2026-06-26
+- Notes: Added direct binding cleanup for email, GitHub, Discord, OIDC, WeChat, Telegram, and Linux.do through `DELETE /api/user/:id/bindings/:binding_type`.
+
+### Reset Passkey
+
+- Owner: `/admin/users`
+- Completed: 2026-06-26
+- Notes: Added high-sensitivity passkey reset through `DELETE /api/user/:id/reset_passkey`.
+
+### Disable User 2FA
+
+- Owner: `/admin/users`
+- Completed: 2026-06-26
+- Notes: Added 2FA stats and high-sensitivity forced disable through `GET /api/user/2fa/stats` and `DELETE /api/user/:id/2fa`.
+
+### User Subscription View And Binding
+
+- Owner: `/admin/users`
+- Completed: 2026-06-26
+- Notes: Added user subscription panel backed by admin subscription routes. Admins can view subscription records, bind a plan without payment, invalidate a subscription, and hard-delete a subscription.
+
 ## Channels
 
 No deferred Channel items remain.
@@ -111,35 +141,7 @@ No deferred Models items remain.
 
 ## Users
 
-### OAuth Binding View And Unbind
-
-- Owner: `/admin/users`
-- Permission: Admin
-- Notes: View a user's OAuth bindings and unbind providers.
-
-### Clear User Bindings
-
-- Owner: `/admin/users`
-- Permission: Admin
-- Notes: Clear email, GitHub, Discord, OIDC, WeChat, Telegram, and related bindings.
-
-### Reset Passkey
-
-- Owner: `/admin/users`
-- Permission: Admin
-- Notes: High-sensitivity operation. Requires confirmation.
-
-### Disable User 2FA
-
-- Owner: `/admin/users`
-- Permission: Admin
-- Notes: High-sensitivity operation. Requires confirmation.
-
-### User Subscription View And Binding
-
-- Owner: `/admin/users` or `/admin/billing`
-- Permission: Admin
-- Notes: User subscription list, create subscription, invalidate subscription, and delete subscription.
+No deferred Users items remain.
 
 ## Logs / Audit
 

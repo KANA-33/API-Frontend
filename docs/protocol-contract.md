@@ -663,10 +663,30 @@ authorization. Root-only routes require root authorization.
   - `PUT /api/user/`
   - `DELETE /api/user/:id`
   - `POST /api/user/manage`
+  - `GET /api/user/:id/oauth/bindings`
+  - `DELETE /api/user/:id/oauth/bindings/:provider_id`
+  - `DELETE /api/user/:id/bindings/:binding_type`
+  - `DELETE /api/user/:id/reset_passkey`
+  - `GET /api/user/2fa/stats`
+  - `DELETE /api/user/:id/2fa`
+  - `GET /api/subscription/admin/plans`
+  - `POST /api/subscription/admin/bind`
+  - `GET /api/subscription/admin/users/:id/subscriptions`
+  - `POST /api/subscription/admin/users/:id/subscriptions`
+  - `POST /api/subscription/admin/user_subscriptions/:id/invalidate`
+  - `DELETE /api/subscription/admin/user_subscriptions/:id`
 - Auth: admin session
 - Query: `PageQuery`; search accepts `keyword`, `group`, `role`, `status`
 - Notes: manage actions include enable, disable, promote, demote, delete, and
-  quota adjustment modes.
+  quota adjustment modes. OAuth binding rows contain provider id, name, slug,
+  icon, and provider user id. Supported clear-binding types are `email`,
+  `github`, `discord`, `oidc`, `wechat`, `telegram`, and `linuxdo`. Reset
+  passkey and disable 2FA are high-sensitivity delete operations. 2FA stats
+  return `{ total_users, enabled_users, enabled_rate }`. User subscription
+  binding uses admin subscription routes; plan binding accepts `{ plan_id }`
+  for a specific user route or `{ user_id, plan_id }` for the generic bind
+  route. Invalidate cancels immediately; delete hard-deletes the subscription
+  record.
 
 ### Admin Channels
 
