@@ -123,6 +123,7 @@ and cross-feature navigation stay predictable.
 - `docs/clean-room-policy.md`: allowed and forbidden source inputs.
 - `docs/protocol-contract.md`: backend communication contract.
 - `docs/backend-endpoint-inventory.md`: endpoint inventory and coverage notes.
+- `docs/development-notes.md`: source layout notes and frontend data truth rules.
 - `docs/feature-parity.md`: user/admin feature matrix.
 - `docs/post-mvp-admin-enhancements.md`: completed and deferred admin work.
 - `docs/admin-mvp-smoke-test.md`: admin MVP smoke-test checklist.

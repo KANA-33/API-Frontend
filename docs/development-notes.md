@@ -70,6 +70,45 @@ Rules:
 - Business errors from `{ success: false, message }` are normalized as
   `ApiError`.
 
+## Frontend Data Truth Rules
+
+Design references define layout, hierarchy, spacing, and interaction patterns.
+They do not define business facts. Every user-visible business value must come
+from one of these sources:
+
+- A backend response field documented in `docs/protocol-contract.md`.
+- A deterministic calculation from documented backend fields.
+- A product-owned constant that is explicitly documented in this repository.
+
+Rules:
+
+- Do not use realistic-looking fake fallbacks for missing backend fields.
+- Do not default missing billing, status, channel, price, tier, error, request,
+  or response fields to plausible business values.
+- Missing backend values must render as `-`, an empty state, or a hidden section.
+- If a design asks for fields that the current API does not provide, implement
+  the visual structure with conservative empty handling and document the missing
+  protocol requirement before filling the content.
+- Detail pages must not imply more precision than the source API supports. If
+  only a list record is available, the detail view may only display fields from
+  that record unless a real detail endpoint exists.
+
+Examples of forbidden fallbacks unless returned by the backend or documented as
+product constants:
+
+- `Dynamic`, `Token Billing`, or any other billing mode as a substitute for an
+  unknown explicit billing mode, except when the mode is derived from documented
+  token/quota fields and labeled accordingly.
+- Fixed prices, rates, multipliers, tiers, or quota formulas.
+- Fixed channel names such as `9Router`.
+- Fixed failure values such as `error`, `client_gone`, or `context canceled`.
+- Derived timing values such as fake first-response time when the backend only
+  provides total duration.
+
+Before completing a feature, check that every displayed business value is either
+protocol-backed, clearly computed from protocol-backed values, or intentionally
+empty.
+
 ## Admin Handling
 
 The commercial user console should not include AGPL admin frontend source. Keep
