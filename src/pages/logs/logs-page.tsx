@@ -348,7 +348,6 @@ export function LogsPage() {
             {records.map((record, index) => (
               <LogRecord
                 activeTab={activeTab}
-                index={index}
                 key={String((record as Record<string, unknown>).id ?? index)}
                 onOpen={() =>
                   setSelectedLog({ activeTab, record: record as Record<string, unknown> })
@@ -426,13 +425,11 @@ function PagerButton({
 
 function LogRecord({
   activeTab,
-  index,
   onOpen,
   platformStatus,
   record,
 }: {
   activeTab: LogTabId;
-  index: number;
   onOpen: () => void;
   platformStatus: PlatformStatus | null;
   record: Record<string, unknown>;
@@ -445,6 +442,7 @@ function LogRecord({
     "updated_at",
   ]);
   const channel = getNumber(record, ["channel", "channel_id"]);
+  const channelName = getString(record, ["channel_name"], "");
   const username = getString(record, ["username", "user_name", "account", "user_id"], "User");
   const model = getString(record, ["model_name", "model", "action", "platform"], "Record");
   const token = getString(record, ["token_name", "token", "task_id", "mj_id"], "default");
@@ -484,10 +482,8 @@ function LogRecord({
       </LogCell>
 
       <LogCell label="Channel">
-        <p className="font-bold text-[#f59e0b]">#{channel || index + 1}</p>
-        <p className="mt-1 text-xs font-semibold text-[#6c6a67]">
-          {getString(record, ["channel_name"], "9Router")}
-        </p>
+        <p className="font-bold text-[#f59e0b]">{channel > 0 ? `#${channel}` : "-"}</p>
+        {channelName && <p className="mt-1 text-xs font-semibold text-[#6c6a67]">{channelName}</p>}
       </LogCell>
 
       <LogCell label="User">
