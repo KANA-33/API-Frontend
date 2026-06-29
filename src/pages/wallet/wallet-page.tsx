@@ -3,7 +3,7 @@ import { RefreshCw } from "lucide-react";
 import { useAuthStore } from "@features/auth/store";
 import { usePlatformStore } from "@features/platform/store";
 import * as walletApi from "@features/wallet/api";
-import { formatQuota, formatRawNumber } from "@shared/lib/quota-format";
+import { formatQuota, formatQuotaFixed, formatRawNumber } from "@shared/lib/quota-format";
 import { useAsyncData } from "@shared/lib/use-async-data";
 import { Button } from "@shared/ui/button";
 import { Card } from "@shared/ui/card";
@@ -175,11 +175,14 @@ export function WalletPage() {
       <Card>
         <p className="text-sm text-[#6c6a67]">Available quota</p>
         <strong className="mt-3 block text-5xl font-semibold">
-          {formatQuota(Math.max((user?.quota ?? 0) - (user?.used_quota ?? 0), 0), platformStatus)}
+          {formatQuotaFixed(
+            Math.max((user?.quota ?? 0) - (user?.used_quota ?? 0), 0),
+            platformStatus,
+          )}
         </strong>
         <p className="mt-4 text-sm text-[#5f5958]">
-          Total quota {formatQuota(user?.quota, platformStatus)}. Used{" "}
-          {formatQuota(user?.used_quota, platformStatus)}.
+          Total quota {formatQuotaFixed(user?.quota, platformStatus)}. Used{" "}
+          {formatQuotaFixed(user?.used_quota, platformStatus)}.
         </p>
       </Card>
 

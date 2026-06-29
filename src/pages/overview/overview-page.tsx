@@ -2,7 +2,7 @@ import { ArrowUpRight, CheckCircle2, Clock3, WalletCards } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import * as overviewApi from "@features/overview/api";
 import { useAuthStore } from "@features/auth/store";
-import { formatQuota, formatRawNumber } from "@shared/lib/quota-format";
+import { formatQuota, formatQuotaFixed, formatRawNumber } from "@shared/lib/quota-format";
 import { useAsyncData } from "@shared/lib/use-async-data";
 import { Card } from "@shared/ui/card";
 import { PageTitle } from "@shared/ui/page-title";
@@ -80,13 +80,13 @@ export function OverviewPage() {
             <div>
               <p className="text-sm text-[#d8cec3]">Remaining quota</p>
               <strong className="mt-4 block text-5xl font-semibold tracking-[-0.03em] text-[#fffaf3]">
-                {formatQuota(remainingQuota, data.status)}
+                {formatQuotaFixed(remainingQuota, data.status)}
               </strong>
             </div>
             <WalletCards className="size-7 text-[#d8cec3]" />
           </div>
           <p className="mt-8 max-w-sm text-sm leading-6 text-[#d8cec3]">
-            Used quota: {formatQuota(user?.used_quota, data.status)}. Request count:{" "}
+            Used quota: {formatQuotaFixed(user?.used_quota, data.status)}. Request count:{" "}
             {formatRawNumber(user?.request_count)}.
           </p>
           <Link

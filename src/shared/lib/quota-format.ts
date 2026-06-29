@@ -34,6 +34,13 @@ function formatDecimal(value: number) {
   }).format(value);
 }
 
+function formatFixedDecimal(value: number, fractionDigits: number) {
+  return new Intl.NumberFormat("en-US", {
+    maximumFractionDigits: fractionDigits,
+    minimumFractionDigits: fractionDigits,
+  }).format(value);
+}
+
 export function formatRawNumber(value?: number) {
   return new Intl.NumberFormat("en-US").format(value ?? 0);
 }
@@ -50,4 +57,22 @@ export function formatQuota(value?: number, status?: PlatformStatus | null) {
   const converted = (quota / quotaPerUnit) * getCurrencyRate(status);
 
   return `${getCurrencySymbol(status)}${formatDecimal(converted)}`;
+}
+
+export function formatQuotaFixed(
+  value?: number,
+  status?: PlatformStatus | null,
+  fractionDigits = 2,
+) {
+  const quota = value ?? 0;
+  const displayType = getDisplayType(status);
+
+  if (!status || displayType === "TOKENS" || status.display_in_currency === false) {
+    return formatRawNumber(quota);
+  }
+
+  const quotaPerUnit = status.quota_per_unit > 0 ? status.quota_per_unit : 1;
+  const converted = (quota / quotaPerUnit) * getCurrencyRate(status);
+
+  return `${getCurrencySymbol(status)}${formatFixedDecimal(converted, fractionDigits)}`;
 }
