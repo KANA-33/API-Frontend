@@ -5,21 +5,25 @@
 This repository is the commercial user-facing console. It is not a continuation
 of the AGPL frontend.
 
-The current shell is intentionally minimal. It establishes:
+The current shell establishes:
 
 - Independent app structure.
 - Independent visual language.
 - Independent route definitions.
 - Independent API client boundary.
 - Documentation-first protocol workflow.
+- A user-console Admin handoff to the original default-theme admin UI.
 
 ## Next Engineering Tasks
 
-1. Bind placeholder pages to typed API modules.
-2. Add loading, empty, and error states for each page.
-3. Add two-factor login UI after confirming final 2FA response payload.
-4. Add Chinese and English copy from newly written product language.
-5. Add release CI for typecheck, build, lint, and provenance review.
+1. Finish user-console visual polish across responsive desktop/mobile states.
+2. Verify all user-console pages against the target backend after every protocol
+   or UI change.
+3. Keep `PUBLIC_LEGACY_ADMIN_URL` aligned with the deployed original
+   default-theme admin UI, currently `/channels`.
+4. Add two-factor login UI after confirming final 2FA response payload.
+5. Complete independently authored Chinese and English product copy.
+6. Keep provenance, typecheck, lint, and build green before release.
 
 ## Suggested Source Layout
 
@@ -34,6 +38,7 @@ src/
     logs/
     models/
     playground/
+    admin/
   pages/
     overview/
     api-keys/
@@ -48,6 +53,7 @@ src/
     ui/
   widgets/
     app-shell/
+    admin-shell/
 ```
 
 Rules:
@@ -111,8 +117,27 @@ empty.
 
 ## Admin Handling
 
-The commercial user console should not include AGPL admin frontend source. Keep
-admin as one of these options:
+The commercial user console should not include AGPL admin frontend source.
+
+Current user-facing behavior:
+
+- The top-right Admin button does not enter the commercial internal `/admin`
+  routes.
+- It hands off to the original default-theme admin UI through
+  `resolveLegacyAdminUrl`.
+- The default original admin path is `/channels`.
+- `PUBLIC_LEGACY_ADMIN_URL` may override that path for deployment-specific
+  routing.
+
+Commercial admin rewrite status:
+
+- A clean-room commercial admin rewrite exists under `src/pages/admin` and
+  `src/widgets/admin-shell`.
+- It remains useful for protocol work, smoke tests, and possible future
+  commercial admin productization.
+- It is not the current primary admin entry from the user console.
+
+Allowed admin strategies:
 
 - Separate AGPL deployment that complies with AGPL.
 - Separate clean-room commercial admin rewrite.

@@ -1,6 +1,12 @@
 # Admin MVP Smoke Test
 
-Use this checklist after connecting the commercial frontend to a compatible backend.
+Use this checklist only when intentionally testing the clean-room commercial
+admin rewrite under `/admin`.
+
+The ordinary user console currently hands admin users off to the original
+default-theme admin UI through `PUBLIC_LEGACY_ADMIN_URL`, with `/channels` as
+the default original admin path. That handoff is tested in
+`docs/integration-qa.md` and `docs/release-checklist.md`.
 
 ## Session And Routing
 

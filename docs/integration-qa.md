@@ -8,6 +8,8 @@ Use this guide when connecting the commercial frontend to a real backend.
 - For local development, prefer `PUBLIC_API_BASE_URL=` and
   `DEV_BACKEND_ORIGIN=http://localhost:3000` so Rsbuild proxies `/api`, `/pg`,
   `/v1`, and `/mj`.
+- Set `PUBLIC_LEGACY_ADMIN_URL=http://localhost:3000/channels` when the
+  user-console Admin button should open the original default-theme admin UI.
 - In dev proxy mode, `PUBLIC_API_BASE_URL` must be empty. If it points directly
   to the backend, login may succeed while `/api/user/self` returns 401 because
   the session cookie belongs to a different origin.
@@ -45,11 +47,14 @@ Check:
 10. Apply and clear log filters.
 11. Open `/models`, then a model detail route.
 12. Open `/playground` and run a non-streaming request.
-13. Sign out and confirm protected routes redirect to `/login`.
+13. If signed in as an admin user, click the top-right Admin button and confirm
+    it opens the original default admin UI at `/channels` on the target backend.
+14. Sign out and confirm protected routes redirect to `/login`.
 
-## Admin Smoke Test
+## Commercial Admin Rewrite Smoke Test
 
-Use `docs/admin-mvp-smoke-test.md` with an admin account and a root account.
+Use `docs/admin-mvp-smoke-test.md` only when intentionally testing the
+commercial clean-room admin rewrite under `/admin`.
 
 - Normal users should be redirected away from `/admin`.
 - Admin users should reach users, channels, models, logs, redemptions, and
@@ -62,9 +67,9 @@ Use `docs/admin-mvp-smoke-test.md` with an admin account and a root account.
 
 The app shell reads `/api/status` before entering the authenticated shell.
 
-- `self_use_mode_enabled: false` hides Playground.
+- Playground is currently a stable user-console navigation item.
 - Additional module visibility should be wired only from backend status or user
-  permission contracts.
+  permission contracts when product requirements explicitly ask for it.
 
 ## Known Deferred Items
 
@@ -74,5 +79,5 @@ The app shell reads `/api/status` before entering the authenticated shell.
 - OAuth login buttons.
 - Registration and password reset pages.
 - Streaming Playground responses.
-- High-sensitivity admin operations such as payment gateway configuration,
-  secret reveal, security editors, and audit tooling.
+- Advanced commercial-admin audit tooling, if the clean-room admin rewrite is
+  productized again.

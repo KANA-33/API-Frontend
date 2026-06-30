@@ -22,9 +22,13 @@ Use this checklist for every commercial frontend release.
 - [ ] Usage, drawing, and task logs load with filters and pagination.
 - [ ] Model list and model detail routes work.
 - [ ] Playground can run a non-streaming request.
-- [x] Admin smoke test in `docs/admin-mvp-smoke-test.md` passes for admin and
-      root accounts.
-- [x] Ordinary users are redirected away from `/admin`.
+- [ ] Admin button opens the original default-theme admin UI at `/channels` or
+      the configured `PUBLIC_LEGACY_ADMIN_URL`.
+- [ ] `PUBLIC_LEGACY_ADMIN_URL` is production-safe and does not point to a
+      localhost URL in production builds.
+- [x] Commercial `/admin` rewrite smoke test in `docs/admin-mvp-smoke-test.md`
+      passes when that internal surface is intentionally tested.
+- [x] Ordinary users are redirected away from commercial `/admin` routes.
 - [x] High-sensitivity admin features remain deferred or protected.
 
 ## Clean-Room Verification
