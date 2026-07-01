@@ -38,15 +38,17 @@ frontend implementation details.
 | Playground | Text request runner      | Implemented        | Playground / Session Chat Completion | Non-streaming `/pg/chat/completions` runner implemented                       |
 | Playground | Model parameter controls | Implemented        | Models                               | Model, system prompt, temperature, top P, and max tokens implemented          |
 | API Keys   | List keys                | Implemented        | API Keys / List API Keys             | Search and pagination implemented                                             |
-| API Keys   | Create key               | Implemented        | API Keys / Create API Key            | Create modal implemented                                                      |
-| API Keys   | Update key               | Implemented        | API Keys / Update API Key            | Edit modal implemented                                                        |
+| API Keys   | Create key               | Implemented        | API Keys / Create API Key            | Create modal supports group, expiry, quantity, unlimited quota, and USD quota |
+| API Keys   | Update key               | Implemented        | API Keys / Update API Key            | Edit modal supports group, expiry, unlimited quota, and USD quota             |
 | API Keys   | Delete or revoke key     | Implemented        | API Keys / Delete API Key            | Delete action implemented                                                     |
 | Wallet     | Balance                  | Implemented        | Wallet / Balance                     | Bound to current user quota                                                   |
 | Wallet     | Billing records          | Implemented        | Wallet / Billing Records             | Bound to top-up records                                                       |
 | Wallet     | Redeem or top up         | Implemented        | Wallet / Redeem Or Top Up            | Redemption, EPay, Stripe, and Waffo implemented; Creem/Waffo Pancake deferred |
 | Profile    | Display user info        | Implemented        | Auth / Current User                  | Bound to auth store                                                           |
 | Profile    | Update profile           | Implemented        | Auth / Update Current User           | Language/password flow uses confirmed profile endpoints                       |
+| Profile    | Email binding            | Implemented        | Auth / Email Verification And Bind   | Sends verification code and binds email through backend email bind flow        |
 | Profile    | Language preference      | Implemented        | Auth / Update Current User           | Bound to `language` update                                                    |
+| Branding   | Dynamic system identity  | Implemented        | Platform / Status                    | System name, logo, document title, and favicon use `/api/status`              |
 
 ## Admin Strategy
 

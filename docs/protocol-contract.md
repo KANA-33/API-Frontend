@@ -153,12 +153,49 @@ interface UpdateCurrentUserRequest {
 - Success Response: `ApiEnvelope<unknown>`
 - Notes: Language/sidebar update paths are handled specially by backend.
 
+### Send Email Verification
+
+- Method: `GET`
+- Path: `/api/verification`
+- Auth: anonymous/session-compatible
+- Query:
+
+```ts
+interface EmailVerificationQuery {
+  email: string;
+}
+```
+
+- Success Response: `ApiEnvelope<null>`
+- Notes: Used before binding an email address to the current session user.
+
+### Bind Email
+
+- Method: `POST`
+- Path: `/api/oauth/email/bind`
+- Auth: user session
+- Request Body:
+
+```ts
+interface BindEmailRequest {
+  email: string;
+  code: string;
+}
+```
+
+- Success Response: `{ success: boolean, message: string }`
+- Notes: Backend validates the verification code, then stores `email` on the
+  current session user.
+
 ### Logout
 
 - Method: `GET`
 - Path: `/api/user/logout`
 - Auth: session
 - Success Response: `{ success: boolean, message: string }`
+- Notes: Backend creates one key per request. The commercial frontend quantity
+  field loops this endpoint client-side and appends `-1`, `-2`, etc. when more
+  than one key is requested.
 - Notes: Server clears session.
 
 ## User Console

@@ -30,14 +30,17 @@ Status: Complete
 Status: Implemented
 
 - Overview loads current quota, usage summary, logs, and platform status.
-- API Keys support list, search, create, edit, reveal, and delete.
+- API Keys support list, search, create, edit, reveal, and delete. The
+  creation flow includes group selection, expiry, quantity, unlimited quota,
+  and USD quota input mapped to backend quota units.
 - Wallet supports balance, billing records, redemption, and confirmed payment
   provider entry points.
 - Logs support usage, drawing, and task tabs with filters, pagination, and modal
   details.
 - Analytics supports model call analysis, traffic flow, and user statistics from
   usage records.
-- Profile displays account information and supports confirmed account actions.
+- Profile displays account information and supports confirmed account actions,
+  including password, language, and email binding via verification code.
 - Playground runs non-streaming session chat requests through
   `/pg/chat/completions`.
 
@@ -50,6 +53,10 @@ Status: Active
 - Creation and settings flows use shared modals.
 - Logs detail opens as a viewport-centered modal.
 - API Keys and Logs list surfaces share a structured table-card language.
+- Public and authenticated shells use dynamic platform identity from
+  `/api/status`, including system name, logo, browser title, and favicon.
+- API Keys creation/editing uses the current System Console modal language with
+  GSAP entry motion that does not replay on intra-form toggles.
 - Remaining work is responsive QA, copy polish, and consistency passes after
   each feature change.
 

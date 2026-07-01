@@ -64,6 +64,8 @@ The backend caps `page_size` at 100.
 | Register           | POST   | `/api/user/register`    | Anonymous       | May require email verification and Turnstile        |
 | Current user       | GET    | `/api/user/self`        | User session    | Main account payload                                |
 | Update profile     | PUT    | `/api/user/self`        | User session    | Supports profile fields, language, sidebar settings |
+| Email verification | GET    | `/api/verification`     | Anonymous       | Sends verification code for email binding/reset flows |
+| Bind email         | POST   | `/api/oauth/email/bind` | User session    | Body `{ email, code }`; binds verified email to current user |
 | Delete own account | DELETE | `/api/user/self`        | User session    | High-risk action                                    |
 | User groups        | GET    | `/api/user/groups`      | Anonymous       | Public group options                                |
 | Self groups        | GET    | `/api/user/self/groups` | User session    | Authenticated group options                         |
@@ -93,7 +95,7 @@ Backend names API keys as tokens.
 | Search keys               | GET    | `/api/token/search`     | User session   | `keyword`, `token`, pagination                 |
 | Key detail                | GET    | `/api/token/:id`        | User session   | Masked key                                     |
 | Reveal key                | POST   | `/api/token/:id/key`    | User session   | Returns full key                               |
-| Create key                | POST   | `/api/token/`           | User session   | Creates generated secret                       |
+| Create key                | POST   | `/api/token/`           | User session   | Creates one generated secret per request       |
 | Update key                | PUT    | `/api/token/`           | User session   | Query `status_only` toggles status-only update |
 | Delete key                | DELETE | `/api/token/:id`        | User session   | Deletes one key                                |
 | Batch delete keys         | POST   | `/api/token/batch`      | User session   | Body `{ ids: number[] }`                       |

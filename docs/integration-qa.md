@@ -38,18 +38,23 @@ Check:
 1. Open `/login`.
 2. Sign in with a test user.
 3. Confirm `/overview` loads account quota and platform status.
-4. Open `/api-keys` and list keys.
-5. Create a test key, reveal it, edit it, then delete it.
-6. Open `/wallet` and confirm balance, payment availability, and records load.
-7. Test redemption in a non-production environment.
-8. Test payment redirects only with sandbox provider credentials.
-9. Open `/logs` and switch usage, drawing, and task tabs.
-10. Apply and clear log filters.
-11. Open `/models`, then a model detail route.
-12. Open `/playground` and run a non-streaming request.
-13. If signed in as an admin user, click the top-right Admin button and confirm
+4. Confirm platform system name, logo, browser title, and favicon reflect
+   `/api/status`.
+5. Open `/api-keys` and list keys.
+6. Create a test key with group, expiry, quantity, unlimited quota, and finite
+   USD quota variants. Reveal it, edit it, then delete it.
+7. Open `/wallet` and confirm balance, payment availability, and records load.
+8. Test redemption in a non-production environment.
+9. Test payment redirects only with sandbox provider credentials.
+10. Open `/logs` and switch usage, drawing, and task tabs.
+11. Apply and clear log filters.
+12. Open `/models`, then a model detail route.
+13. Open `/playground` and run a non-streaming request.
+14. Open `/profile`, send an email verification code, and bind a disposable
+    test email.
+15. If signed in as an admin user, click the top-right Admin button and confirm
     it opens the original default admin UI at `/channels` on the target backend.
-14. Sign out and confirm protected routes redirect to `/login`.
+16. Sign out and confirm protected routes redirect to `/login`.
 
 ## Commercial Admin Rewrite Smoke Test
 
