@@ -1,7 +1,7 @@
 import { useGSAP } from "@gsap/react";
 import { Link } from "@tanstack/react-router";
 import gsap from "gsap";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Boxes } from "lucide-react";
 import { useEffect, useRef, type CSSProperties } from "react";
 import { useAuthStore } from "@features/auth/store";
 import { usePlatformStore } from "@features/platform/store";
@@ -200,6 +200,13 @@ export function LandingPage() {
         </Link>
           </div>
         <div className="flex origin-right scale-80 items-center">
+          <Link
+            className="mr-2 hidden h-10 items-center gap-2 rounded-lg px-3 text-sm font-semibold uppercase tracking-[0.08em] text-[#2b2621] transition-colors hover:bg-[#eee8e1] sm:inline-flex"
+            to="/pricing"
+          >
+            <Boxes className="size-4" />
+            Models Square
+          </Link>
           {user ? (
             <UserAvatarMenu />
           ) : (

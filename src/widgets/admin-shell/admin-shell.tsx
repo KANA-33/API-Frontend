@@ -126,6 +126,13 @@ export function AdminShell() {
               </div>
               <div className="flex items-center gap-2" data-admin-bar-item>
                 <Link
+                  className="hidden h-10 items-center gap-2 rounded-lg px-3 text-sm font-semibold uppercase tracking-[0.08em] text-[#2b2621] transition-colors hover:bg-[#eee8e1] sm:inline-flex"
+                  to="/pricing"
+                >
+                  <Boxes className="size-4" />
+                  Models Square
+                </Link>
+                <Link
                   className="inline-flex h-10 items-center justify-center rounded-lg px-3 text-sm font-semibold uppercase tracking-[0.08em] text-[#2b2621] transition-colors hover:bg-[#eee8e1]"
                   to="/overview"
                 >

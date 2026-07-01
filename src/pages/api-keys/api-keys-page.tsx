@@ -178,7 +178,7 @@ export function ApiKeysPage() {
   }, []);
 
   const groupOptions = useMemo(() => {
-    const values = normalizeGroups(groupsData);
+    const values = normalizeGroups(groupsData ?? undefined);
     const fallback = user?.group || "default";
     return Array.from(new Set([fallback, ...values].filter(Boolean)));
   }, [groupsData, user?.group]);

@@ -27,6 +27,7 @@ import { LandingPage } from "@pages/landing/landing-page";
 import { LoginPage } from "@pages/login/login-page";
 import { LogsPage } from "@pages/logs/logs-page";
 import { ModelDetailPage } from "@pages/models/model-detail-page";
+import { ModelSquarePage } from "@pages/models/model-square-page";
 import { ModelsPage } from "@pages/models/models-page";
 import { OverviewPage } from "@pages/overview/overview-page";
 import { PlaygroundPage } from "@pages/playground/playground-page";
@@ -149,6 +150,12 @@ const modelsRoute = createRoute({
   component: ModelsPage,
 });
 
+const pricingRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/pricing",
+  component: ModelSquarePage,
+});
+
 const modelDetailRoute = createRoute({
   getParentRoute: () => appRoute,
   path: "/models/$modelId",
@@ -236,6 +243,7 @@ const adminSettingsRoute = createRoute({
 const routeTree = rootRoute.addChildren([
   indexRoute,
   loginRoute,
+  pricingRoute,
   adminRoute.addChildren([
     adminIndexRoute,
     adminUsersRoute,

@@ -4,6 +4,7 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import {
   BarChart3,
+  Boxes,
   Code2,
   CreditCard,
   KeyRound,
@@ -37,6 +38,10 @@ function getPageTitle(pathname: string) {
 
   if (pathname === "/models") {
     return "Analytics";
+  }
+
+  if (pathname === "/pricing") {
+    return "Models Square";
   }
 
   const matched = navigation.find((item) => item.to === pathname);
@@ -143,6 +148,13 @@ export function AppShell() {
                   Admin
                 </a>
               )}
+              <Link
+                className="hidden h-10 items-center gap-2 rounded-lg px-3 text-sm font-semibold uppercase tracking-[0.08em] text-[#2b2621] transition-colors hover:bg-[#eee8e1] sm:inline-flex"
+                to="/pricing"
+              >
+                <Boxes className="size-4" />
+                Models Square
+              </Link>
               <UserAvatarMenu />
             </div>
           </div>
